@@ -8,12 +8,14 @@ from server.hw_controller.leds.leds_types.dimmable import Dimmable
 from server.hw_controller.leds.leds_types.RGB_neopixels import RGBNeopixels
 from server.hw_controller.leds.leds_types.RGBW_neopixels import RGBWNeopixels
 from server.hw_controller.leds.leds_types.WWA_neopixels import WWANeopixels
+from server.hw_controller.leds.leds_types.wled import WLED
 from server.hw_controller.leds.light_sensors.tsl2591 import TSL2591
 
 class LedsController:
     def __init__(self, app):
         self.app = app
         self.dimensions = None
+        self.wled_host = None
         self.driver = None
         self.sensor = None
         self._mutex = Lock()
@@ -84,6 +86,8 @@ class LedsController:
 
     # sets a fixed color for the leds
     def set_color(self, color):
+        if hasattr(self.driver, "release"):     # a WLED device is shared with other controllers: Sandypi takes it over only when asked to
+            self.driver.release()
         r = int(color[1:3], 16)
         g = int(color[3:5], 16)
         b = int(color[5:7], 16)
@@ -122,29 +126,44 @@ class LedsController:
             restart = True
         settings = DotMap(settings_utils.get_only_values(settings))
         dims = (int(settings.leds.width), int(settings.leds.height), int(settings.leds.circumference))
+        wled_host = settings.leds.wled_host
         if self.dimensions != dims:
             self.dimensions = dims
             self.leds_type = None
             self.pin = None
-        if (self.leds_type != settings.leds.type) or (self.pin != settings.leds.pin1):
+        if (self.leds_type != settings.leds.type) or (self.pin != settings.leds.pin1) or (self.wled_host != wled_host):
             self.pin = settings.leds.pin1
             self.leds_type = settings.leds.type
+            self.wled_host = wled_host
             try:
                 # the leds number calculation depends on the type of table. 
                 # If is square or rectangular should use a base and height, for round tables will use the total number of leds directly
                 leds_number = (int(self.dimensions[0]) + int(self.dimensions[1]))*2 if settings.device.type == "Cartesian" else int(self.dimensions[2])
                 leds_class = Dimmable
+                kwargs = {}
                 if self.leds_type == "RGB":
                     leds_class = RGBNeopixels
                 elif self.leds_type == "RGBW":
                     leds_class = RGBWNeopixels
                 elif self.leds_type == "WWA":
                     leds_class = WWANeopixels
-                
-                self.driver = leds_class(leds_number, settings.leds.pin1, logger=self.app.logger)
+                elif self.leds_type == "WLED":
+                    # WLED runs on a separate microcontroller reached over the network:
+                    # the pin is meaningless and the strip is described by the device itself
+                    leds_class = WLED
+                    kwargs = {
+                        "host": wled_host,
+                        "realtime": bool(settings.leds.wled_realtime),
+                        "takeover_on_start": bool(settings.leds.wled_takeover_on_start)
+                    }
+
+                self.driver = leds_class(leds_number, settings.leds.pin1, logger=self.app.logger, **kwargs)
             except Exception as e: 
                 self.driver = None
-                self.app.semits.show_toast_on_UI("Led driver type not compatible with current HW")
+                if self.leds_type == "WLED":
+                    self.app.semits.show_toast_on_UI("Cannot reach the WLED device at '{}'".format(wled_host))
+                else:
+                    self.app.semits.show_toast_on_UI("Led driver type not compatible with current HW")
                 self.app.logger.exception(e)
                 self.app.logger.error("Cannot initialize leds controller")
             try: 

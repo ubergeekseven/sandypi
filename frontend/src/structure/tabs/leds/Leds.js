@@ -36,6 +36,7 @@ class LedsController extends Component{
             let PickerType = RGBWColorPicker
             if (this.props.settings.leds.type.value === "WWA")
                 PickerType = WWAColorPicker
+            // a WLED controller reports its own channels: the white slider is shown only for RGBW strips
             let show_white_channel = this.props.settings.leds.type.value === "RGBW";
             let show_auto_dim = this.props.settings.leds.has_light_sensor.value;
             return <PickerType

@@ -220,17 +220,58 @@ const defaultSettings = {
 				"RGB",
 				"RGBW",
 				"Dimmable",
-				"WWA"
+				"WWA",
+				"WLED"
 			],
 			label: "Select a led type",
-			tip: "RGB and RGBW LEDs are compatible with WS2812B compatible drivers. The 'Dimmable' option is suitable for single color strips."
+			tip: "RGB and RGBW LEDs are compatible with WS2812B compatible drivers and are wired to the GPIO of this device. The 'Dimmable' option is suitable for single color strips. Choose 'WLED' to drive a strip connected to a WLED controller (ESP8266/ESP32) over the network."
 		},
 		pin1: {
 			name: "leds.pin1",
 			type: "input",
 			value: 18,
 			label: "Pin number",
-			tip: "Uses the BCM pin number"
+			tip: "Uses the BCM pin number",
+			depends_on: "leds.type",
+			depends_values: [
+				"RGB",
+				"RGBW",
+				"Dimmable",
+				"WWA"
+			]
+		},
+		wled_host: {
+			name: "leds.wled_host",
+			type: "input",
+			value: "",
+			label: "WLED address",
+			tip: "Hostname or ip address of the WLED controller, for example 'wled-table.local' or '192.168.1.50'",
+			depends_on: "leds.type",
+			depends_values: [
+				"WLED"
+			]
+		},
+		wled_realtime: {
+			name: "leds.wled_realtime",
+			type: "check",
+			value: true,
+			label: "Use the WLED realtime protocol",
+			tip: "Sends per-pixel animations over UDP instead of the HTTP API. Much faster, but WLED goes back to its own effects a couple of seconds after the animation stops",
+			depends_on: "leds.type",
+			depends_values: [
+				"WLED"
+			]
+		},
+		wled_takeover_on_start: {
+			name: "leds.wled_takeover_on_start",
+			type: "check",
+			value: false,
+			label: "Take over WLED on startup",
+			tip: "When disabled, Sandypi leaves the lights as they are (as set by Home Assistant or the WLED app) until a color is chosen from the LEDs page",
+			depends_on: "leds.type",
+			depends_values: [
+				"WLED"
+			]
 		},
 		available: {
 			value: false,
