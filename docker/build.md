@@ -8,9 +8,13 @@ It is fairly easy to build the image for Linux (amd64) (or Windows with wsl) but
 
 It is possible to do the same on a running Raspberry Pi but it will require quite a long time to complete the image build.
 
-The command required is (must be run from the main sandypi folder, not from the docker folder)
+The image expects two files that are generated from the current commit and are not
+kept in git (`git_shash.json` and `frontend/.env`), so they have to be written first.
+
+The commands required are (must be run from the main sandypi folder, not from the docker folder)
 
 ```bash
+$> python dev_tools/update_frontend_version_hash.py
 $> docker build -f docker/Dockerfile -t sandypi .
 ```
 
@@ -21,6 +25,15 @@ $> docker run -d -p 5000:5000 sandypi
 ```
 
 After running this command the software will be available on `localhost:5000`.
+
+To build *and* run an image from this repository in one step, with volumes for the
+persistent data and without Watchtower pulling the upstream image over it, use
+[docker/build_local.sh](build_local.sh) and
+[docker/docker-compose.local.yml](docker-compose.local.yml):
+
+```bash
+$> ./docker/build_local.sh
+```
 
 **Important**: the container will be stopped when the device is switched off. Furthermore, if the container is updated, the content will be deleted. To keep persistent data you need to use volumes. To make your like easier a docker-compose file is available in the [Install with Docker](readme.md) section. In this case, you will need to modify the file to change the `docker-compose.yml` file to use the freshly created image.
 

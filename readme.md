@@ -55,6 +55,8 @@ Upload `.gcode` files, or drop an `.svg` and let Sandypi convert it: the drawing
 
 Moving an existing table to this version? [There is a page for that](/docs/migrating_an_existing_table.md).
 
+No table connected yet? Almost everything (drawings, playlists, the queue, the SVG conversion, WLED lights) can be tried without a board thanks to the built-in emulator: see [testing without the table](/docs/testing_without_hardware.md).
+
 ## Installation troubleshooting
 
 If you find problems during the installation check the [troubleshooting](/docs/troubleshooting.md) page

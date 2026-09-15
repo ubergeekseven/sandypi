@@ -1,0 +1,72 @@
+# Docker compose file to run an image built from THIS repository.
+#
+# The standard docker-compose.yml pulls `texx00/sandypi` from Docker Hub and lets
+# Watchtower keep it up to date. That is the right setup to follow upstream, but
+# on a fork it means the container never contains your own changes, and Watchtower
+# would happily replace whatever you built. This file builds from the source next
+# to it instead, and leaves updates alone.
+#
+# Build and start (from the main sandypi folder, not from docker/):
+#
+#   $> python dev_tools/update_frontend_version_hash.py
+#   $> docker compose -f docker/docker-compose.local.yml up -d --build
+#
+# ...or just run docker/build_local.sh, which does both.
+#
+# The interface is then on http://<host>:5100
+#
+# No serial device is attached and the container is not privileged: the server
+# falls back to its built-in board emulator, which is enough to work on drawings,
+# playlists and lights. To drive a real board, see the `devices` block below.
+
+# without this the project would be named after the folder holding this file ('docker')
+name: sandypi
+
+services:
+  sandypi:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: sandypi:local
+    container_name: sandypi
+    restart: unless-stopped
+    ports:
+      - 5100:5000
+    volumes:
+      - database:/sandypi/server/database/db
+      - static:/sandypi/server/static
+      - saves:/sandypi/server/saves
+      - autodetect:/sandypi/server/autodetect
+      - logs:/sandypi/server/logs
+
+    # --- Driving a real board -------------------------------------------------
+    # Uncomment and set the path of the controller. `ls /dev/serial/by-id/` on the
+    # host gives a name that survives a reboot, unlike /dev/ttyUSB0.
+    #
+    # devices:
+    #   - /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0:/dev/ttyUSB0
+    #
+    # The upstream compose file mounts the whole /dev and runs privileged instead.
+    # That works too, but a single device is enough and much less far reaching.
+
+    # --- Shutting the machine down from the interface -------------------------
+    # Only needed for the "shutdown/reboot" buttons. Left out on purpose: it gives
+    # the container the run of the host.
+    #
+    # volumes:
+    #   - /run/systemd/system:/run/systemd/system
+    #   - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+    #   - /sbin/shutdown:/sbin/shutdown
+    #   - /sbin/reboot:/sbin/reboot
+
+volumes:
+  database:
+    name: sandypi_database
+  static:
+    name: sandypi_static
+  saves:
+    name: sandypi_saves
+  autodetect:
+    name: sandypi_autodetect
+  logs:
+    name: sandypi_logs
