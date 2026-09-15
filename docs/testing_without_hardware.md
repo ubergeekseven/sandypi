@@ -56,6 +56,8 @@ $> ./docker/build_local.sh
 That writes the two generated version files, builds the image, and starts it with
 volumes for the persistent data. The interface is then on `http://<host>:5100`.
 
+On Windows, run it from Git Bash or WSL rather than from `cmd` or PowerShell.
+
 Other useful commands:
 
 ```bash
