@@ -47,6 +47,14 @@ Once the wiring type and the pin number is specified it is possible to associate
 
 It is possible to control LEDs strips directly from the interface. [Check the full procedure for more info](/docs/hardware/leds.md).
 
+Strips driven by a [WLED](https://kno.wled.ge/) controller are supported too: nothing is wired to the Raspberry Pi and the strip keeps working with Home Assistant and the WLED app at the same time. [See the dedicated section](/docs/hardware/leds.md#wled).
+
+## Drawings
+
+Upload `.gcode` files, or drop an `.svg` and let Sandypi convert it: the drawing is fitted to the table, can be simplified, reordered to shorten the moves between strokes and split into layers that build the picture up over time. [Check the details here](/docs/svg_drawings.md).
+
+Moving an existing table to this version? [There is a page for that](/docs/migrating_an_existing_table.md).
+
 ## Installation troubleshooting
 
 If you find problems during the installation check the [troubleshooting](/docs/troubleshooting.md) page
@@ -105,13 +113,14 @@ Here is a brief list of what the software is capable of and what will be impleme
 * [x] Simple installation script to simplify the installation
 * [x] Run the application on a single page with full js frontend and python (flask) backend
 * [x] Upload locally your designs (with a preview as well) to keep them all in the same place
+* [x] Convert SVG drawings to gcode, fitted to the table, with simplification and layering
 * [x] Create playlists and manage the designs
 * [x] Run a drawing whenever you want
 * [x] Run gcode commands manually
 * [x] Feed the table periodically
 * [x] Shuffle mode to play shuffled drawings continuosly
 * [x] Show the realtime gcode simulation with time estimate (ETA)
-* [x] Simple lights/led control
+* [x] Simple lights/led control (GPIO strips and WLED controllers)
 * [x] Update the software automatically
 * [x] Interact with physical buttons to control the table
 * [ ] Create logo

@@ -56,9 +56,10 @@ class Settings extends Component{
     }
 
     generateHWSettings(){
-        if (!this.props.settings.buttons.available) // TODO include LEDS in this check
-            return "";
-        else return <Subsection sectionTitle="Additional hardware">
+        // the LEDs section is always shown: a WLED controller needs no local hardware, so the
+        // options must be reachable even on a machine without GPIO (otherwise there would be no
+        // way to configure the address of the device in the first place)
+        return <Subsection sectionTitle="Additional hardware">
             {this.generateHWLEDs()}
             {this.generateHWButtonsForm()}
         </Subsection>
@@ -124,16 +125,14 @@ class Settings extends Component{
     }
 
     generateHWLEDs(){
-        if (this.props.settings.leds.available){
-            let ledsEntries =      Object.entries(this.props.settings.leds);
-            return <SectionGroup sectionTitle="LEDs">
-                <Container>
-                    <Form.Row>
-                        {this.mapEntries(ledsEntries)}
-                    </Form.Row>
-                </Container>
-            </SectionGroup>
-        }else return "";
+        let ledsEntries = Object.entries(this.props.settings.leds);
+        return <SectionGroup sectionTitle="LEDs">
+            <Container>
+                <Form.Row>
+                    {this.mapEntries(ledsEntries)}
+                </Form.Row>
+            </Container>
+        </SectionGroup>
     }
 
     // render the list of settings divided by sections

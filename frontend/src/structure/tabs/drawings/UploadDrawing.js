@@ -80,11 +80,12 @@ class UploadDrawingsModal extends Component{
                 <div className={ "w-100" + (this.state.loading ? " d-none" : "")}>
                     <Dropzone
                         onDrop={this.handleFiles.bind(this)} 
-                        accept={".gcode"}       
+                        accept={".gcode,.svg"}
                         noKeyboard>
                         {({getRootProps, getInputProps, isDragActive}) => (<div {...getRootProps()} className={"animated-background m-2 p-5 mh-100 d-flex justify-content-center align-items-center" + (isDragActive ? " drag-active" : "")}>
                             <input {...getInputProps()}/>
-                            <div className="d-block text-center">Drag and drop the .gcode file here <br/>or click to open the file explorer
+                            <div className="d-block text-center">Drag and drop the .gcode or .svg file here <br/>or click to open the file explorer
+                                <br/><small className="text-muted">An .svg drawing is converted to gcode and fitted to the table</small>
                                 </div>
                             </div>)}
                     </Dropzone>
